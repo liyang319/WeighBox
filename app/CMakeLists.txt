@@ -24,6 +24,8 @@ file(GLOB_RECURSE ALL_SOURCE "*.cpp" "*.c")
 
 if(${ARM})
   link_directories(${PROJECT_SOURCE_DIR}/lib/arm/openssl)
+elseif(${LINUXBUILD})
+  link_directories(${PROJECT_SOURCE_DIR}/lib/linux/openssl)
 elseif(${MACBUILD})
   link_directories(${PROJECT_SOURCE_DIR}/lib/macos/openssl)
 endif()
