@@ -40,6 +40,7 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/build/output)
 # execute file 
 add_executable(${EXECUTABLE_NAME} ${ALL_SOURCE})
 
-target_link_libraries(${EXECUTABLE_NAME} ssl)
-target_link_libraries(${EXECUTABLE_NAME} crypto)
+
 target_link_libraries(${EXECUTABLE_NAME} mosquitto_static)
+target_link_libraries(${EXECUTABLE_NAME} ssl)
+target_link_libraries(${EXECUTABLE_NAME} crypto)                   
