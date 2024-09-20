@@ -16,6 +16,7 @@
 #define MQTT_MESSAGE "Hello from MQTT C++ Client"
 
 bool MqttThread::isRunning = false;
+bool MqttThread::isConnected = false;
 
 MqttThread::MqttThread()
 {
@@ -48,22 +49,27 @@ void MqttThread::start()
                              {
             while (isRunning)
             {
-                if (mosquitto_connect(mosq, MQTT_HOST, MQTT_PORT, 60))
+                if (!isConnected && mosquitto_connect(mosq, MQTT_HOST, MQTT_PORT, 60))
                 {
                     std::cerr << "连接到MQTT服务器失败，尝试重连" << std::endl;
                     std::this_thread::sleep_for(std::chrono::seconds(5)); // 等待5秒后重连
                 }
                 else
                 {
-                    if (mosquitto_subscribe(mosq, NULL, MQTT_TOPIC, 0))
+                    if (!isConnected && mosquitto_subscribe(mosq, NULL, MQTT_TOPIC, 0))
                     {
                         std::cerr << "订阅" << MQTT_TOPIC << "失败" << std::endl;
                         return;
                     }
 
+                    if (!isConnected)
+                    {
+                        isConnected = true;
+                        std::cout << "连接成功" << std::endl;
+                    }
+
                     mosquitto_loop_start(mosq);
                 }
-                sleep(10);
             } });
     }
 }
@@ -105,18 +111,19 @@ void MqttThread::connect_callback(struct mosquitto *mosq, void *userdata, int re
 {
     if (!result)
     {
-        std::cout << "连接成功" << std::endl;
+        isConnected = true;
+        COUT << "连接成功" << std::endl;
     }
     else
     {
-        std::cerr << "连接失败" << std::endl;
+        COUT << "连接失败" << std::endl;
     }
 }
 
 void MqttThread::disconnect_callback(struct mosquitto *mosq, void *userdata, int result)
 {
     std::cerr << "连接断开，尝试重新连接" << std::endl;
-
+    isConnected = false;
     std::this_thread::sleep_for(std::chrono::seconds(5)); // 等待5秒后重连
 
     while (isRunning && mosquitto_reconnect(mosq))

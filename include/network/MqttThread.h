@@ -19,6 +19,7 @@ private:
     struct mosquitto *mosq;
     std::thread thread;
     static bool isRunning;
+    static bool isConnected;
 
     static void message_callback(struct mosquitto *mosq, void *userdata, const struct mosquitto_message *message);
     static void connect_callback(struct mosquitto *mosq, void *userdata, int result);
