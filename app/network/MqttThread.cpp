@@ -14,6 +14,7 @@
 
 // 消息内容
 #define MQTT_MESSAGE "Hello from MQTT C++ Client"
+#define MQTT_CONNECT_TIMEOUT 5
 
 bool MqttThread::isRunning = false;
 bool MqttThread::isConnected = false;
@@ -49,23 +50,23 @@ void MqttThread::start()
                              {
             while (isRunning)
             {
-                if (!isConnected && mosquitto_connect(mosq, MQTT_HOST, MQTT_PORT, 60))
+                if (!isConnected && mosquitto_connect(mosq, MQTT_HOST, MQTT_PORT, MQTT_CONNECT_TIMEOUT))
                 {
-                    std::cerr << "连接到MQTT服务器失败，尝试重连" << std::endl;
+                    COUT << "连接到MQTT服务器失败，尝试重连" << std::endl;
                     std::this_thread::sleep_for(std::chrono::seconds(5)); // 等待5秒后重连
                 }
                 else
                 {
                     if (!isConnected && mosquitto_subscribe(mosq, NULL, MQTT_TOPIC, 0))
                     {
-                        std::cerr << "订阅" << MQTT_TOPIC << "失败" << std::endl;
+                        COUT<< "订阅" << MQTT_TOPIC << "失败" << std::endl;
                         return;
                     }
 
                     if (!isConnected)
                     {
                         isConnected = true;
-                        std::cout << "连接成功" << std::endl;
+                        // std::cout << "连接成功" << std::endl;
                     }
 
                     mosquitto_loop_start(mosq);
